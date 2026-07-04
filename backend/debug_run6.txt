@@ -1,0 +1,99 @@
+﻿venv\Scripts\python : 2026-07-04 12:03:45.522 | DEBUG    | app.retrieval.vector_store:__init__:39 - ChromaDB 
+collection 'regulatory_chunks' loaded with 35 items
+At line:1 char:1
++ venv\Scripts\python -c "
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-07-04 12:0...d with 35 items:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-04 12:03:45.523 | INFO     | app.retrieval.bm25_index:_load_from_cache:155 - BM25 index loaded from cache (35 
+chunks)
+2026-07-04 12:03:45.523 | DEBUG    | app.retrieval.hybrid_retriever:_auto_rebuild_bm25_if_stale:155 - BM25 index is 
+fresh: 35 chunks (ChromaDB has 35)
+2026-07-04 12:03:45.703 | INFO     | app.rag.query_analyzer:analyze_query:120 - Query analysis: type=factual, 
+attributes=[], structured_reasoning=False
+2026-07-04 12:03:45.703 | INFO     | app.rag.pipeline:run:113 - Pipeline start: 'What educational qualifications are 
+accepted for Executive D' | type=factual | structured=False
+2026-07-04 12:03:45.704 | INFO     | app.retrieval.embeddings:get_embedding_model:27 - Loading embedding model: 
+BAAI/bge-small-en-v1.5
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 199/199 [00:00<00:00, 9918.56it/s]
+C:\Users\HARSH LAD\Desktop\project\Gen AI\Regulatory Change Radar\backend\app\retrieval\embeddings.py:29: 
+FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  logger.info(f"\u2705 Embedding model loaded (dim={model.get_sentence_embedding_dimension()})")
+2026-07-04 12:03:51.911 | INFO     | app.retrieval.embeddings:get_embedding_model:29 - \u2705 Embedding model loaded 
+(dim=384)
+2026-07-04 12:03:51.967 | DEBUG    | app.retrieval.hybrid_retriever:reciprocal_rank_fusion:81 - RRF fusion: 20 dense + 
+20 BM25 \u2192 27 unique candidates
+2026-07-04 12:03:51.967 | INFO     | app.retrieval.reranker:get_reranker:25 - Loading reranker model: 
+cross-encoder/ms-marco-MiniLM-L-6-v2
+
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 105/105 [00:00<00:00, 8351.07it/s]
+2026-07-04 12:04:02.370 | INFO     | app.retrieval.reranker:get_reranker:27 - \u2705 Reranker model loaded
+2026-07-04 12:04:03.295 | DEBUG    | app.retrieval.reranker:rerank:75 - Reranked 20 candidates \u2192 top 5 (best 
+score: 2.895 for: Recruitment of Executive Director û 1 (one) post Securities à) [14 below threshold -10.0]
+2026-07-04 12:04:03.295 | INFO     | app.retrieval.hybrid_retriever:search:217 - Hybrid search for 'What educational 
+qualifications are accepted for Executive D': 20 dense + 20 BM25 -> 27 fused -> 5 reranked (regulator_filter=SEBI)
+2026-07-04 12:04:03.295 | INFO     | app.rag.pipeline:run:164 - Confidence gate PASSED: top score=2.895, 5 chunks 
+retrieved
+2026-07-04 12:04:03.295 | INFO     | app.rag.reasoning_agent:run_reasoning:83 - Reasoning Agent: using Path C (factual 
+pass-through)
+2026-07-04 12:04:03.639 | INFO     | app.rag.synthesis_agent:run_synthesis:66 - Synthesis dedup: 5 chunks \u2192 5 
+unique (0 removed as near-duplicates)
+2026-07-04 12:04:03.639 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 12:04:04.334 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 547 chars
+2026-07-04 12:04:04.334 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 12:04:04.974 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 1219 chars
+2026-07-04 12:04:04.975 | WARNING  | app.rag.verification_agent:run_verification:96 - Verification FAILED (high/medium 
+confidence): ['Claim of accepted educational qualifications includes MBA/MMS with specialization in Finance, CA, CS, 
+CFA, CWA, LLB, Post-Graduation in Economics or Finance, and Any other discipline considered useful to the Board by the 
+SEBI. However, evidence [5] states that the accepted educational qualifications include MBA/MMS with specialization in 
+Finance, CA, CS, CFA, CWA, LLB, Post Graduation in Economics, Finance or any other discipline which in the opinion of 
+the Board is useful, from a recognized University / Institution with minimum of 20 years of post-qualification 
+experience in dealing with problems relating to securities market or special knowledge / experience Law, 
+Investigation, Finance, Economics, Accountancy, Administration or any other discipline considered useful to the 
+Board.', 'Evidence [1] and [2] do not explicitly mention that MBA/MMS with specialization in Finance, CA, CS, CFA, 
+CWA, LLB, Post-Graduation in Economics or Finance are the only accepted educational qualifications. It only mentions 
+that these are the qualifications mentioned in the context of the post of Executive Director on contract/deputation 
+basis.'] (confidence=medium)
+2026-07-04 12:04:04.975 | INFO     | app.rag.pipeline:run:203 - Pipeline complete: verified=False, total=19272ms | 
+stages: {'query_analysis': 0, 'retrieval': 17592, 'confidence_gate': 0, 'reasoning': 0, 'synthesis': 1038, 
+'verification': 640, 'total': 19272}
+Traceback (most recent call last):
+  File "<string>", line 19, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "C:\Program Files\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Program Files\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Program Files\Python313\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "<string>", line 17, in main
+    print('Final Answer:\n', res.final_answer)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 749-754: character maps to <undefined>
+=== QUERY ===
+What educational qualifications are accepted for Executive Director?
+
+=== REASONING PATH ===
+factual
+
+=== SYNTHESIS ANSWER ===
+Verified: False
+Issues: ['Claim of accepted educational qualifications includes MBA/MMS with specialization in Finance, CA, CS, CFA, CWA, LLB, Post-Graduation in Economics or Finance, and Any other discipline considered useful to the Board by the SEBI. However, evidence [5] states that the accepted educational qualifications include MBA/MMS with specialization in Finance, CA, CS, CFA, CWA, LLB, Post Graduation in Economics, Finance or any other discipline which in the opinion of the Board is useful, from a recognized University / Institution with minimum of 20 years of post-qualification experience in dealing with problems relating to securities market or special knowledge / experience Law, Investigation, Finance, Economics, Accountancy, Administration or any other discipline considered useful to the Board.', 'Evidence [1] and [2] do not explicitly mention that MBA/MMS with specialization in Finance, CA, CS, CFA, CWA, LLB, Post-Graduation in Economics or Finance are the only accepted educational qualifications. It only mentions that these are the qualifications mentioned in the context of the post of Executive Director on contract/deputation basis.']
+Confidence: medium
+Final Answer:
+ 

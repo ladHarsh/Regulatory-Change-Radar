@@ -1,0 +1,102 @@
+﻿venv\Scripts\python : 2026-07-04 12:07:46.798 | DEBUG    | app.retrieval.vector_store:__init__:39 - ChromaDB 
+collection 'regulatory_chunks' loaded with 35 items
+At line:1 char:1
++ venv\Scripts\python -c "
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-07-04 12:0...d with 35 items:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-04 12:07:46.799 | INFO     | app.retrieval.bm25_index:_load_from_cache:155 - BM25 index loaded from cache (35 
+chunks)
+2026-07-04 12:07:46.800 | DEBUG    | app.retrieval.hybrid_retriever:_auto_rebuild_bm25_if_stale:155 - BM25 index is 
+fresh: 35 chunks (ChromaDB has 35)
+2026-07-04 12:07:46.974 | INFO     | app.rag.query_analyzer:analyze_query:120 - Query analysis: type=scenario, 
+attributes=['age', 'experience'], structured_reasoning=True
+2026-07-04 12:07:46.974 | INFO     | app.rag.pipeline:run:113 - Pipeline start: 'Is a 52-year-old candidate with 22 
+years of post-qualificati' | type=scenario | structured=True
+2026-07-04 12:07:46.976 | INFO     | app.retrieval.embeddings:get_embedding_model:27 - Loading embedding model: 
+BAAI/bge-small-en-v1.5
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 199/199 [00:00<00:00, 10226.37it/s]
+C:\Users\HARSH LAD\Desktop\project\Gen AI\Regulatory Change Radar\backend\app\retrieval\embeddings.py:29: 
+FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  logger.info(f"\u2705 Embedding model loaded (dim={model.get_sentence_embedding_dimension()})")
+2026-07-04 12:07:55.508 | INFO     | app.retrieval.embeddings:get_embedding_model:29 - \u2705 Embedding model loaded 
+(dim=384)
+2026-07-04 12:07:55.565 | DEBUG    | app.retrieval.hybrid_retriever:reciprocal_rank_fusion:81 - RRF fusion: 20 dense + 
+20 BM25 \u2192 27 unique candidates
+2026-07-04 12:07:55.565 | INFO     | app.retrieval.reranker:get_reranker:25 - Loading reranker model: 
+cross-encoder/ms-marco-MiniLM-L-6-v2
+
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 105/105 [00:00<00:00, 4824.00it/s]
+2026-07-04 12:08:05.134 | INFO     | app.retrieval.reranker:get_reranker:27 - \u2705 Reranker model loaded
+2026-07-04 12:08:06.128 | DEBUG    | app.retrieval.reranker:rerank:75 - Reranked 20 candidates \u2192 top 5 (best 
+score: 0.097 for: [ON CONTRACT BASIS > June 30, 2026:]
+CFA / CWA / LLB / Post à) [5 below threshold -10.0]
+2026-07-04 12:08:06.128 | INFO     | app.retrieval.hybrid_retriever:search:217 - Hybrid search for 'Is a 52-year-old 
+candidate with 22 years of post-qualificati': 20 dense + 20 BM25 -> 27 fused -> 5 reranked (regulator_filter=SEBI)
+2026-07-04 12:08:06.128 | INFO     | app.rag.pipeline:run:164 - Confidence gate PASSED: top score=0.097, 5 chunks 
+retrieved
+2026-07-04 12:08:06.128 | INFO     | app.rag.reasoning_agent:run_reasoning:93 - Reasoning Agent: using Path A 
+(structured extraction + code eval)
+2026-07-04 12:08:06.129 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 12:08:07.757 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 2656 chars
+2026-07-04 12:08:07.758 | INFO     | app.rag.reasoning_agent:_structured_path:170 - Structured reasoning complete: 
+ELIGIBLE (13 rules evaluated)
+2026-07-04 12:08:08.081 | INFO     | app.rag.synthesis_agent:run_synthesis:66 - Synthesis dedup: 5 chunks \u2192 5 
+unique (0 removed as near-duplicates)
+2026-07-04 12:08:08.081 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 12:08:09.440 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 559 chars
+2026-07-04 12:08:09.440 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 12:08:24.256 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 722 chars
+2026-07-04 12:08:24.256 | WARNING  | app.rag.verification_agent:run_verification:86 - Verification flagged 
+medium-confidence issues: ["The answer claims the candidate is ELIGIBLE, but the evidence does not explicitly state 
+that the candidate's income, qualification, and other details are not required for eligibility. However, the evidence 
+does state that the Board reserves the right to relax certain eligibility criteria in deserving cases.", "The answer 
+claims the candidate is ELIGIBLE, but the evidence does not explicitly state that the candidate's income is not 
+required for eligibility. The evidence states that the monthly gross emoluments at the beginning of the scale work out 
+to \u20b97.47 lacs/- (with Board provided accommodation) \u20b98.97 lacs/- (without accommodation)."]. Bypassing 
+fallback.
+2026-07-04 12:08:24.257 | INFO     | app.rag.pipeline:run:203 - Pipeline complete: verified=True, total=37282ms | 
+stages: {'query_analysis': 0, 'retrieval': 19153, 'confidence_gate': 0, 'reasoning': 1629, 'synthesis': 1682, 
+'verification': 14816, 'total': 37282}
+=== QUERY ===
+Is a 52-year-old candidate with 22 years of experience and an MBA in Finance eligible?
+
+=== REASONING PATH ===
+structured
+
+=== REASONING TRACE ===
+Rule: age must be >= 40.0 years | Candidate value: 52.0 years | Met: YES
+Rule: age must be <= 55.0 years | Candidate value: 52.0 years | Met: YES
+Rule: age must be <= 57.0 years | Candidate value: 52.0 years | Met: YES
+Rule: experience must be >= 20.0 years | Candidate value: 22.0 years | Met: YES
+Rule: experience must be >= 20.0 years | Candidate value: 22.0 years | Met: YES
+Rule: income == 312000.0 rupees | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: income == 332000.0 rupees | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == CFA  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == CWA  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == LLB  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == Post Graduation in Economics  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == Post Graduation in Finance  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+Rule: qualification == MBA  | Candidate value: NOT PROVIDED | Met: UNKNOWN
+
+Final: ELIGIBLE
+
+=== SYNTHESIS ANSWER ===
+Verified: True
+Final Answer:
+ The candidate is ELIGIBLE for the SEBI ED post.
+
+The candidate meets the age criteria, with an age of 52 years being within the specified range of 40-55 years as on June 30, 2026. Additionally, the candidate has 22 years of post-qualification experience, which meets the required minimum of 20 years. However, the candidate's income, qualification, and other details are not provided, but these are not explicitly required for eligibility.
+
+Basis:
+[1] SEBI ù Invitation of Applications for the Post of Executive Director: 
+[ON CONTRACT BASIS > June 30, 2026:]

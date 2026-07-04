@@ -1,0 +1,99 @@
+﻿venv\Scripts\python : 2026-07-04 11:55:14.146 | DEBUG    | app.retrieval.vector_store:__init__:39 - ChromaDB 
+collection 'regulatory_chunks' loaded with 128 items
+At line:1 char:1
++ venv\Scripts\python -c "
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-07-04 11:5... with 128 items:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-04 11:55:14.150 | INFO     | app.retrieval.bm25_index:_load_from_cache:155 - BM25 index loaded from cache (128 
+chunks)
+2026-07-04 11:55:14.151 | DEBUG    | app.retrieval.hybrid_retriever:_auto_rebuild_bm25_if_stale:155 - BM25 index is 
+fresh: 128 chunks (ChromaDB has 128)
+2026-07-04 11:55:14.327 | INFO     | app.rag.query_analyzer:analyze_query:120 - Query analysis: type=factual, 
+attributes=[], structured_reasoning=False
+2026-07-04 11:55:14.327 | INFO     | app.rag.pipeline:run:113 - Pipeline start: 'What educational qualifications are 
+accepted for Executive D' | type=factual | structured=False
+2026-07-04 11:55:14.328 | INFO     | app.retrieval.embeddings:get_embedding_model:27 - Loading embedding model: 
+BAAI/bge-small-en-v1.5
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 199/199 [00:00<00:00, 19981.96it/s]
+C:\Users\HARSH LAD\Desktop\project\Gen AI\Regulatory Change Radar\backend\app\retrieval\embeddings.py:29: 
+FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  logger.info(f"\u2705 Embedding model loaded (dim={model.get_sentence_embedding_dimension()})")
+2026-07-04 11:55:21.061 | INFO     | app.retrieval.embeddings:get_embedding_model:29 - \u2705 Embedding model loaded 
+(dim=384)
+2026-07-04 11:55:21.149 | DEBUG    | app.retrieval.hybrid_retriever:reciprocal_rank_fusion:81 - RRF fusion: 20 dense + 
+20 BM25 \u2192 34 unique candidates
+2026-07-04 11:55:21.149 | INFO     | app.retrieval.reranker:get_reranker:25 - Loading reranker model: 
+cross-encoder/ms-marco-MiniLM-L-6-v2
+
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 105/105 [00:00<00:00, 12845.70it/s]
+2026-07-04 11:55:29.276 | INFO     | app.retrieval.reranker:get_reranker:27 - \u2705 Reranker model loaded
+2026-07-04 11:55:30.304 | DEBUG    | app.retrieval.reranker:rerank:75 - Reranked 20 candidates \u2192 top 5 (best 
+score: 3.160 for: Recruitment of Executive Director û 1 (one) post Securities à) [0 below threshold -10.0]
+2026-07-04 11:55:30.305 | INFO     | app.retrieval.hybrid_retriever:search:217 - Hybrid search for 'What educational 
+qualifications are accepted for Executive D': 20 dense + 20 BM25 -> 34 fused -> 5 reranked (regulator_filter=SEBI)
+2026-07-04 11:55:30.305 | INFO     | app.rag.pipeline:run:164 - Confidence gate PASSED: top score=3.160, 5 chunks 
+retrieved
+2026-07-04 11:55:30.305 | INFO     | app.rag.reasoning_agent:run_reasoning:86 - Reasoning Agent: using Path B 
+(chain-of-thought)
+2026-07-04 11:55:30.318 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 11:55:31.711 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 1176 chars
+2026-07-04 11:55:32.138 | DEBUG    | app.rag.synthesis_agent:_embedding_dedup:154 - Dedup: chunk 1 similarity 0.999 to 
+chunk 0 \u2192 removed
+2026-07-04 11:55:32.138 | DEBUG    | app.rag.synthesis_agent:_embedding_dedup:154 - Dedup: chunk 2 similarity 0.998 to 
+chunk 0 \u2192 removed
+2026-07-04 11:55:32.139 | DEBUG    | app.rag.synthesis_agent:_embedding_dedup:154 - Dedup: chunk 3 similarity 0.998 to 
+chunk 0 \u2192 removed
+2026-07-04 11:55:32.139 | DEBUG    | app.rag.synthesis_agent:_embedding_dedup:154 - Dedup: chunk 4 similarity 0.996 to 
+chunk 0 \u2192 removed
+2026-07-04 11:55:32.139 | INFO     | app.rag.synthesis_agent:run_synthesis:66 - Synthesis dedup: 5 chunks \u2192 1 
+unique (4 removed as near-duplicates)
+2026-07-04 11:55:32.139 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 11:55:32.602 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 554 chars
+2026-07-04 11:55:32.603 | DEBUG    | app.llm.groq_client:complete:74 - Groq request: model=llama-3.1-8b-instant, 
+tokens\u22641024
+2026-07-04 11:55:33.192 | DEBUG    | app.llm.groq_client:complete:84 - Groq response: 694 chars
+2026-07-04 11:55:33.194 | WARNING  | app.rag.verification_agent:run_verification:88 - Verification FAILED: ["The 
+candidate's age is not within the specified range of 40-55 years as on June 30, 2026. However, the evidence does not 
+provide the candidate's age.", "The candidate's MBA degree is accepted, but they lack the required 20 years of 
+post-qualification experience in dealing with problems related to the securities market or special 
+knowledge/experience in relevant disciplines. However, the evidence does not specify the candidate's experience.", 
+"The answer states that the candidate's age is not within the specified range, but the evidence does not provide the 
+candidate's age, making this claim unsubstantiated."] (confidence=low)
+2026-07-04 11:55:33.194 | INFO     | app.rag.pipeline:run:203 - Pipeline complete: verified=False, total=18867ms | 
+stages: {'query_analysis': 0, 'retrieval': 15977, 'confidence_gate': 0, 'reasoning': 1406, 'synthesis': 891, 
+'verification': 591, 'total': 18867}
+=== QUERY ===
+What educational qualifications are accepted for Executive Director?
+
+=== REASONING PATH ===
+chain_of_thought
+
+=== REASONING TRACE ===
+1. Condition: MBA/MMS with specialization in Finance / CA / CS / CFA / CWA / LLB / Post Graduation in Economics, Finance or any other discipline which in the opinion of the Board is useful.
+   Rule: Educational Qualification & Experience as on June 30, 2026 | Candidate value: MBA (specialization not specified) | Met: YES
+
+2. Condition: Minimum of 20 years of post-qualification experience in dealing with problems relating to securities market or special knowledge/experience in Law, Investigation, Finance, Economics, Accountancy, Administration or any other discipline considered useful to the Board.
+   Rule: Educational Qualification & Experience as on June 30, 2026 | Candidate value: Not specified | Met: NO
+
+3. Condition: Not less than 40 years and not more than 55 years as on June 30, 2026.
+   Rule: Age Limit as on June 30, 2026 | Candidate value: Not specified | Met: NO
+
+4. Condition: However, in deserving cases up to maximum of 57 years as on June 30, 2026 may be considered.
+   Rule: Age Limit as on June 30, 2026 | Candidate value: Not specified | Met: NO
+
+Final: NOT ELIGIBLE
+The candidate does not meet the minimum experience requirement and the age limit.
+
+=== SYNTHESIS ANSWER ===
+Verified: False
+Issues: ["The candidate's age is not within the specified range of 40-55 years as on June 30, 2026. However, the evidence does not provide the candidate's age.", "The candidate's MBA degree is accepted, but they lack the required 20 years of post-qualification experience in dealing with problems related to the securities market or special knowledge/experience in relevant disciplines. However, the evidence does not specify the candidate's experience.", "The answer states that the candidate's age is not within the specified range, but the evidence does not provide the candidate's age, making this claim unsubstantiated."]
+Confidence: low
