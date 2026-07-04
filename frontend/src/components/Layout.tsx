@@ -12,7 +12,7 @@ const BOTTOM_NAV = [
   { to: '/timeline', icon: GitCompare, label: 'Timeline' },
   { to: '/query', icon: MessageSquare, label: 'Ask' },
   { to: '/policy-check', icon: Shield, label: 'Policy' },
-  { to: '/evaluation', icon: BarChart3, label: 'Eval' },
+  { to: '/documents', icon: Library, label: 'Docs' },
 ]
 
 const SIDEBAR_NAV = [

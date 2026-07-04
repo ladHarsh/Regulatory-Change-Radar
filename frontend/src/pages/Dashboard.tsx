@@ -226,6 +226,7 @@ export function Dashboard() {
   )
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [showBanner, setShowBanner] = useState(false)
+  const [activeCardIndex, setActiveCardIndex] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
   const syncPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -279,6 +280,29 @@ export function Dashboard() {
 
   // Cleanup poll on unmount
   useEffect(() => () => { if (syncPollRef.current) clearInterval(syncPollRef.current) }, [])
+
+  // Sync scroll position with active card indicator
+  useEffect(() => {
+    const el = carouselRef.current
+    if (!el) return
+    const handleScroll = () => {
+      if (!el.children.length) return
+      const childWidth = (el.children[0] as HTMLElement).offsetWidth || 250
+      const gap = 12 // 0.75rem (gap-3)
+      const newIndex = Math.round(el.scrollLeft / (childWidth + gap))
+      setActiveCardIndex(Math.min((stats ? 4 : 0) - 1, Math.max(0, newIndex)))
+    }
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [stats])
+
+  const scrollToCard = (index: number) => {
+    const el = carouselRef.current
+    if (!el || !el.children.length) return
+    const childWidth = (el.children[0] as HTMLElement).offsetWidth || 250
+    const gap = 12
+    el.scrollTo({ left: index * (childWidth + gap), behavior: 'smooth' })
+  }
 
   const handleSync = async () => {
     setSyncing(true)
@@ -383,10 +407,12 @@ export function Dashboard() {
         {/* Scroll hint dots */}
         <div className="flex justify-center gap-1.5 mt-1">
           {statCards.map((_, i) => (
-            <div
+            <button
               key={i}
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: i === 0 ? 'var(--color-accent-amber)' : 'var(--color-border)' }}
+              onClick={() => scrollToCard(i)}
+              className="w-2 h-2 rounded-full transition-all duration-300"
+              style={{ background: i === activeCardIndex ? 'var(--color-accent-amber)' : 'var(--color-border)' }}
+              aria-label={`Scroll to card ${i + 1}`}
             />
           ))}
         </div>
