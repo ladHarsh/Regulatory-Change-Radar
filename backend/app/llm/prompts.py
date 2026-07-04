@@ -243,13 +243,15 @@ SOURCE EVIDENCE:
 QUESTION: {question}
 
 SYNTHESIS RULES:
-1. Do NOT copy raw source text verbatim — summarize in your own words.
-2. Do NOT repeat the same fact more than once.
-3. For eligibility/scenario questions: clearly state the conclusion (eligible/not eligible) \
+1. Answer ONLY the specific question asked. Do not infer candidate eligibility unless the question explicitly asks for an eligibility evaluation.
+2. Ignore unrelated retrieved information and return only facts relevant to the user's query.
+3. Do NOT copy raw source text verbatim — summarize in your own words.
+4. Do NOT repeat the same fact more than once.
+5. For eligibility/scenario questions: clearly state the conclusion (eligible/not eligible) \
    FIRST, then explain which conditions were met or not met.
-4. For factual questions: answer directly in 2-4 sentences.
-5. End with a "Basis:" line citing the specific document(s) used.
-6. Use bullet points ONLY if the answer has 3+ distinct parts.
+6. For factual questions: answer directly in 2-4 sentences.
+7. End with a "Basis:" line citing the specific document(s) used.
+8. Use bullet points ONLY if the answer has 3+ distinct parts.
 
 {eligibility_instruction}
 

@@ -253,26 +253,49 @@ export function Dashboard() {
   const startSyncPolling = useCallback((prevDocCount: number) => {
     if (syncPollRef.current) clearInterval(syncPollRef.current)
     let attempts = 0
+    let stableCount = 0
+
     syncPollRef.current = setInterval(async () => {
       attempts++
-      if (attempts > 30) { // 30 * 3s = 90s max
+
+      // Hard timeout after 90s
+      if (attempts > 30) {
         clearInterval(syncPollRef.current!)
         syncPollRef.current = null
         setSyncStatus('error')
         setSyncMsg('Sync timed out — check backend logs.')
         return
       }
+
       try {
         const docs = await getDocuments()
-        if (docs.length > prevDocCount) {
+        const currentCount = docs.length
+
+        if (currentCount > prevDocCount) {
+          // New documents appeared — great!
           clearInterval(syncPollRef.current!)
           syncPollRef.current = null
           const now = new Date().toISOString()
           localStorage.setItem('radar-last-synced', now)
           setLastSynced(now)
           setSyncStatus('done')
-          setSyncMsg(`✓ Synced ${docs.length - prevDocCount} new document${docs.length - prevDocCount !== 1 ? 's' : ''}`)
+          setSyncMsg(`✓ Synced ${currentCount - prevDocCount} new document${currentCount - prevDocCount !== 1 ? 's' : ''}`)
           load() // Refresh stats + timeline
+        } else if (attempts >= 5 && currentCount === prevDocCount) {
+          // After 15s, if count is stable, the pipeline ran but found no new/changed docs
+          stableCount++
+          if (stableCount >= 2) {
+            clearInterval(syncPollRef.current!)
+            syncPollRef.current = null
+            const now = new Date().toISOString()
+            localStorage.setItem('radar-last-synced', now)
+            setLastSynced(now)
+            setSyncStatus('done')
+            setSyncMsg(currentCount > 0
+              ? `✓ All ${currentCount} documents are up-to-date`
+              : '✓ Sync complete — no new documents found')
+            load() // Refresh stats + timeline
+          }
         }
       } catch { /* ignore poll errors */ }
     }, 3000)
@@ -321,13 +344,21 @@ export function Dashboard() {
     }
   }
 
-  // Build stat cards array
-  const statCards = stats ? [
-    { icon: <AlertTriangle size={18} />, label: 'High Severity', value: stats.high_severity_count, accentColor: '#ef4444' },
-    { icon: <TrendingUp size={18} />, label: 'This Month', value: stats.changes_this_month, accentColor: '#f59e0b' },
-    { icon: <FileText size={18} />, label: 'Total Changes', value: stats.total_changes, accentColor: '#6366f1' },
-    { icon: <Clock size={18} />, label: 'Low Severity', value: stats.low_severity_count, accentColor: '#10b981' },
-  ] : []
+  // Build stat cards array — use zero fallback so cards always render
+  const displayStats = stats ?? {
+    total_changes: 0,
+    changes_this_month: 0,
+    high_severity_count: 0,
+    medium_severity_count: 0,
+    low_severity_count: 0,
+    last_detected_at: null,
+  }
+  const statCards = [
+    { icon: <AlertTriangle size={18} />, label: 'High Severity', value: displayStats.high_severity_count, accentColor: '#ef4444' },
+    { icon: <TrendingUp size={18} />, label: 'This Month', value: displayStats.changes_this_month, accentColor: '#f59e0b' },
+    { icon: <FileText size={18} />, label: 'Total Changes', value: displayStats.total_changes, accentColor: '#6366f1' },
+    { icon: <Clock size={18} />, label: 'Low Severity', value: displayStats.low_severity_count, accentColor: '#10b981' },
+  ]
 
   return (
     <div className="p-4 lg:p-6 max-w-6xl mx-auto">

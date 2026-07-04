@@ -94,13 +94,11 @@ def analyze_query(question: str) -> QueryAnalysis:
     """
     q_lower = question.lower()
 
-    # Detect query type
-    query_type = _detect_type(q_lower)
-
-    # Extract candidate attributes for eligibility/scenario queries
-    attributes: List[CandidateAttribute] = []
-    if query_type in ("eligibility", "scenario"):
-        attributes = _extract_candidate_attributes(question)
+    # Extract candidate attributes first, as their presence helps determine the type
+    attributes = _extract_candidate_attributes(question)
+    
+    # Detect query type using attributes
+    query_type = _detect_type(q_lower, len(attributes) > 0)
 
     # Extract domain hint from question for focused retrieval
     domain_hint = _extract_domain_hint(q_lower)
@@ -128,19 +126,21 @@ def analyze_query(question: str) -> QueryAnalysis:
 
 # ── Private helpers ───────────────────────────────────────────────────────────
 
-def _detect_type(q_lower: str) -> str:
+def _detect_type(q_lower: str, has_attributes: bool) -> str:
     """Classifies query into one of 4 types based on keyword presence."""
 
     # Check eligibility keywords first (most specific)
     if any(kw in q_lower for kw in _ELIGIBILITY_KEYWORDS):
         # Further distinguish: if numeric candidate info present → scenario
-        if any(kw in q_lower for kw in _SCENARIO_KEYWORDS) or re.search(r"\d+\s*year", q_lower):
+        if has_attributes or any(kw in q_lower for kw in _SCENARIO_KEYWORDS):
             return "scenario"
         return "eligibility"
 
     # Scenario: has numeric candidate attributes regardless of eligibility words
+    # BUT only if we actually found attributes, otherwise it's just a factual query (e.g., "what is the salary of...")
     if any(kw in q_lower for kw in _SCENARIO_KEYWORDS):
-        return "scenario"
+        if has_attributes:
+            return "scenario"
 
     # Comparison
     if any(kw in q_lower for kw in _COMPARISON_KEYWORDS):
