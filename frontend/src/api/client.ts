@@ -1,5 +1,12 @@
-// api/client.ts — v2.0: Centralized API client with type-safe helpers
+// api/client.ts — v3.0: Environment-aware API routing
+// Short REST calls go through /api (Vercel proxy → Render).
+// Long-running streaming queries call Render DIRECTLY to bypass Vercel's 10s timeout.
 import axios from 'axios'
+
+// In production on Vercel, use the Render backend directly for streaming/long requests.
+// In dev, use the Vite proxy (same origin).
+export const DIRECT_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://regulatory-change-radar-backend.onrender.com'
+const IS_PROD = !import.meta.env.DEV
 
 const api = axios.create({
   baseURL: '/api',
@@ -242,7 +249,13 @@ export async function queryRagStream(
   onChunk: (text: string) => void,
   options?: { top_k?: number; regulator_filter?: string },
 ): Promise<QueryResponse> {
-  const response = await fetch('/api/query', {
+  // In production, call the backend DIRECTLY to avoid Vercel's 10s proxy timeout.
+  // In dev, use the Vite proxy (/api → localhost:8000).
+  const queryUrl = IS_PROD
+    ? `${DIRECT_BACKEND_URL}/api/query`
+    : '/api/query'
+
+  const response = await fetch(queryUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question, stream: true, ...options }),
