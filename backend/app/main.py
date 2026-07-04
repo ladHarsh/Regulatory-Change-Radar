@@ -73,6 +73,33 @@ async def lifespan(app: FastAPI):
     # Run lightweight migrations for columns added after initial schema creation
     _run_migrations()
 
+    # Self-healing: Ingest baseline documents in a background thread if the database is empty.
+    # This ensures that even on Render free tier restarts where the ephemeral DB is wiped,
+    # the server automatically repopulates itself with documents.
+    from app.db.session import SessionLocal
+    from app.db.models import Document
+    import threading
+    from app.ingestion.pipeline import run_ingestion_pipeline
+
+    db = SessionLocal()
+    try:
+        doc_count = db.query(Document).count()
+        if doc_count == 0:
+            logger.info("Database is empty on startup. Triggering automatic baseline ingestion in a background thread...")
+            # Run in a daemon thread so it doesn't block FastAPI startup
+            thread = threading.Thread(
+                target=run_ingestion_pipeline,
+                kwargs={"regulators": ["RBI", "SEBI"], "max_docs": 5}
+            )
+            thread.daemon = True
+            thread.start()
+        else:
+            logger.info(f"Database contains {doc_count} documents. Skipping auto-ingestion.")
+    except Exception as e:
+        logger.error(f"Error checking database for self-healing: {e}")
+    finally:
+        db.close()
+
     yield
 
     logger.info("👋 Shutting down Regulatory Change Radar API")
