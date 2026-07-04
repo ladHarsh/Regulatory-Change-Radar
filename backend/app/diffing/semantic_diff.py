@@ -82,9 +82,30 @@ def run_semantic_diff(
         f"new_version={new_version.id}"
     )
 
+    # ── Baseline Ingestion Early Exit ─────────────────────────────────────────
+    if old_version is None:
+        logger.info(f"Baseline document {new_version.id} ingestion. Creating single Document-Level ChangeRecord.")
+        record = ChangeRecord(
+            old_version_id=None,
+            new_version_id=new_version.id,
+            change_type=NEW,
+            similarity_score=None,
+            old_clause=None,
+            new_clause="[Entire Document Published]",
+            old_section_ref=None,
+            new_section_ref=None,
+            impact_summary="A new regulatory document was published. Please review the full text for compliance implications.",
+            affected_area="General compliance",
+            risk_direction="increased",
+            severity="Medium",
+        )
+        db.add(record)
+        db.flush()
+        return [record]
+
     # ── Step 1: Split into clauses ────────────────────────────────────────────
     new_clauses = split_into_clauses(new_version.raw_text)
-    old_clauses = split_into_clauses(old_version.raw_text) if old_version else []
+    old_clauses = split_into_clauses(old_version.raw_text)
 
     logger.info(
         f"Clause extraction: {len(old_clauses)} old clauses, {len(new_clauses)} new clauses"
