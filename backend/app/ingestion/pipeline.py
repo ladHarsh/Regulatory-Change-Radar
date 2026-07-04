@@ -131,6 +131,14 @@ def run_ingestion_pipeline(
                 )
                 logger.info(f"[SYNC PIPELINE] Version check result: is_new={is_new}, Version ID={version.id if version else None}")
 
+                # Self-healing: if not new, but has no chunks, it crashed previously
+                if not is_new and version:
+                    from app.db.models import DocumentChunk
+                    chunk_count = db.query(DocumentChunk).filter(DocumentChunk.version_id == version.id).count()
+                    if chunk_count == 0:
+                        logger.warning(f"[SYNC PIPELINE] Version {version.id} exists but has no chunks (likely from a previous crash). Forcing re-process.")
+                        is_new = True
+
                 if not is_new:
                     logger.info(f"[SYNC PIPELINE] Content is identical to previous version. Skipping remaining processing for doc {idx}.")
                     skipped += 1
