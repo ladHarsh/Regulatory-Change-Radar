@@ -29,7 +29,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.db.models import ChangeRecord, DocumentVersion
 from app.diffing.clause_splitter import Clause, split_into_clauses
-from app.retrieval.embeddings import embed_documents, cosine_similarity
+from app.retrieval.embeddings import embed_documents
 
 settings = get_settings()
 

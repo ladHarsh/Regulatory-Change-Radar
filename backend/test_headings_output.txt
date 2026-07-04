@@ -1,9 +1,0 @@
-﻿venv\Scripts\python : C:\Users\HARSH LAD\Desktop\project\Gen AI\Regulatory Change 
-Radar\backend\venv\Scripts\python.exe: can't open file 'C:\\Users\\HARSH LAD\\Desktop\\project\\Gen AI\\Regulatory 
-Change Radar\\backend\\scratch\\test_headings.py': [Errno 2] No such file or directory
-At line:1 char:1
-+ venv\Scripts\python scratch/test_headings.py 2>&1 | out-file -encodin ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (C:\Users\HARSH ...le or directory:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 

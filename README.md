@@ -36,6 +36,15 @@ Through a series of optimizations (tiered verification, model resizing, parallel
 
 ---
 
+## 🧹 Codebase Cleanup & Architecture Audit
+
+Prior to the `v3` release, a complete architecture audit was performed resulting in a significantly leaner footprint:
+- **Dead Files Removed**: 17+ debug and legacy log files deleted (e.g. `qual_chunk.txt`, `debug_run*.txt`, obsolete SQLite shards).
+- **Dependencies Optimized**: Removed unused `difflib2` in Python backend and `clsx` from the React frontend, relying purely on built-in native modules and core Tailwind.
+- **Dead Code Eliminated**: Scrubbed unused imports (`uuid`, `cosine_similarity`) across the pipeline via static analysis (`vulture` and `depcheck`) to tighten execution paths and maintain 100% active endpoints.
+
+---
+
 ## 🛠️ Project Structure
 
 ```

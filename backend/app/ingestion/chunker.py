@@ -8,7 +8,6 @@ Strategy:
   4. Attach rich metadata to each chunk for retrieval and attribution
 """
 import re
-import uuid
 from typing import Dict, List
 
 from loguru import logger
