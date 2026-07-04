@@ -54,7 +54,7 @@ class Settings(BaseSettings):
 
     # --- CORS ---
     cors_origins: Union[List[str], str] = Field(
-        default="http://localhost:5173,http://localhost:3000",
+        default="https://regulatory-change-radar.vercel.app,https://regulatory-change-radar-git-main-ladharsh.vercel.app,http://localhost:5173,http://localhost:3000",
         description="Comma-separated allowed origins",
     )
 
