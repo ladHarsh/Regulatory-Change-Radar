@@ -92,10 +92,14 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
+# In production, we allow all origins because the Vercel frontend domain may
+# vary (preview deployments, custom domains, etc.). The backend is protected
+# by the Groq API key requirement for sensitive operations.
+_cors_origins = settings.cors_origins if settings.app_env != "production" else ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=settings.app_env != "production",  # can't use credentials with wildcard
     allow_methods=["*"],
     allow_headers=["*"],
 )

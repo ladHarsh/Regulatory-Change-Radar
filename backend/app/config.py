@@ -62,7 +62,8 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v):
         if isinstance(v, str):
-            return [o.strip() for o in v.split(",") if o.strip()]
+            parsed = [o.strip() for o in v.split(",") if o.strip()]
+            return parsed
         return v
 
     # --- App ---

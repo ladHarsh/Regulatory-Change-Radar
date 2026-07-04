@@ -21,3 +21,21 @@ services:
         value: ./data/chroma
       - key: SQLITE_URL
         value: sqlite:///./data/radar.db
+      - key: CORS_ORIGINS
+        value: "https://regulatory-change-radar.vercel.app,https://regulatory-change-radar-git-main-ladharsh.vercel.app,http://localhost:5173,http://localhost:3000"
+      - key: CHUNK_SIZE
+        value: "512"
+      - key: CHUNK_OVERLAP
+        value: "50"
+      - key: RETRIEVAL_TOP_K
+        value: "20"
+      - key: RERANK_TOP_N
+        value: "5"
+      - key: DIFF_UNCHANGED_THRESHOLD
+        value: "0.95"
+      - key: DIFF_MODIFIED_THRESHOLD
+        value: "0.75"
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
