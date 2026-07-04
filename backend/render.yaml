@@ -4,6 +4,9 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    disk:
+      name: radar-data
+      mountPath: /data
     envVars:
       - key: LLM_PROVIDER
         value: groq
@@ -16,11 +19,11 @@ services:
       - key: RERANKER_MODEL
         value: cross-encoder/ms-marco-MiniLM-L-6-v2
       - key: DATA_DIR
-        value: ./data
+        value: /data
       - key: CHROMA_DIR
-        value: ./data/chroma
+        value: /data/chroma
       - key: SQLITE_URL
-        value: sqlite:///./data/radar.db
+        value: sqlite:////data/radar.db
       - key: CORS_ORIGINS
         value: "https://regulatory-change-radar.vercel.app,https://regulatory-change-radar-git-main-ladharsh.vercel.app,http://localhost:5173,http://localhost:3000"
       - key: CHUNK_SIZE

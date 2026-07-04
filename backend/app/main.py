@@ -148,3 +148,44 @@ def root():
         "docs": "/docs",
         "health": "/health",
     }
+
+
+# ── Debug Route ─────────────────────────────────────────────────────────────
+@app.get("/api/debug/db", tags=["debug"])
+def debug_db():
+    """
+    Exposes raw DB counts for troubleshooting production issues.
+    """
+    from app.db.session import SessionLocal
+    from app.db.models import Document, DocumentVersion, DocumentChunk, ChangeRecord
+    import os
+
+    db = SessionLocal()
+    try:
+        doc_count = db.query(Document).count()
+        ver_count = db.query(DocumentVersion).count()
+        chunk_count = db.query(DocumentChunk).count()
+        change_count = db.query(ChangeRecord).count()
+        
+        # Check files in data directory
+        data_files = []
+        if os.path.exists(settings.data_dir):
+            for root, dirs, files in os.walk(settings.data_dir):
+                for f in files[:20]: # cap at 20 files
+                    data_files.append(os.path.join(root, f))
+                    
+        return {
+            "sqlite_url": settings.sqlite_url,
+            "data_dir": settings.data_dir,
+            "chroma_dir": settings.chroma_dir,
+            "documents_count": doc_count,
+            "versions_count": ver_count,
+            "chunks_count": chunk_count,
+            "changes_count": change_count,
+            "files_found": data_files[:20],
+        }
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        db.close()
+
